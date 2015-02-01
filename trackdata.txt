@@ -1,0 +1,20 @@
+Trackname:
+Shell Eco Marathon
+Mapfile:
+mapfile.txt
+timeLimit:
+2700
+trackLength:
+1000
+trackLaps:
+10
+
+Zones:
+3
+
+1
+200
+2
+300
+3
+500
