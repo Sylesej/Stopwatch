@@ -3,6 +3,7 @@ designed for use by the DTU Roadrunners
 at the Shell Eco Marathon. v0.1 by Nils
 Toudal."""
 
+#Import needed functions
 import time
 import sys
 import linecache
@@ -27,7 +28,7 @@ def start():
     return tStart
 
 def lapTime(startTime): #, data
-  #This function writes the time since startTime in data
+  #This function writes the time since startTime in datafile choosen by user
   place = raw_input('Enter a position on the track: ')
   if place == 'E':
     print 'You terminated the program.'
@@ -40,25 +41,31 @@ def lapTime(startTime): #, data
     print ' '*20 + 'Time: ' + str(delta) + ' '*4 + 'Position: '+ place
     return True
 
-
+#Ask user for output file name and trackname, for development 'trackdata.txt'
+#can be used.
 filename = raw_input('Select a name for your output data file: ')
 trackfile = raw_input('Enter name of track data file: ')
 mapfile = linecache.getline('trackdata.txt',4)
 mapfile = mapfile[0:len(mapfile)-1]
 
+#Files are opened
 data = open(filename,'w')
 track = open(trackfile,'a')
 themap = open(mapfile)
 
+#Map is printed from file and file is closed again.
 print 'This is a map of your track: '
 print themap.read()
 themap.close()
 
+#Time is started by user command
 tStart = start()
 
+#Race is going on as long as the user wants
 race = True
 while race == True:
   race = lapTime(tStart)
 
+#At end files are closed for safety
 data.close()
 track.close()
