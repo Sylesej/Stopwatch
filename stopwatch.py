@@ -41,8 +41,25 @@ def lapTime(startTime): #, data
     print ' '*20 + 'Time: ' + str(delta) + ' '*4 + 'Position: '+ place
     return True
 
-#Ask user for output file name and trackname, for development 'trackdata.txt'
-#can be used.
+def file_len(fname):
+    with open(fname) as f:
+        for i, l in enumerate(f):
+            pass
+    return i + 1
+
+def load_track(track):
+    len = file_len(trackfile)
+    zones = [0]*len
+    for n in range(len):
+        zones[n] = linecache.getline('trackdata.txt',13+n)
+    return zones
+
+
+
+
+
+#Ask user for output file name and trackname
+#For development 'trackdata.txt' can be used.
 filename = raw_input('Select a name for your output data file: ')
 trackfile = raw_input('Enter name of track data file: ')
 mapfile = linecache.getline('trackdata.txt',4)
@@ -58,14 +75,19 @@ print 'This is a map of your track: '
 print themap.read()
 themap.close()
 
+zones = load_track(track)
+track.close()
+for obj in zones:
+    print obj
+
 #Time is started by user command
 tStart = start()
 
 #Race is going on as long as the user wants
 race = True
-while race == True:
+while race != False:
   race = lapTime(tStart)
+
 
 #At end files are closed for safety
 data.close()
-track.close()

@@ -9,12 +9,7 @@ trackLength:
 trackLaps:
 10
 
-Zones:
-3
-
-1
-200
-2
-300
-3
-500
+zones:
+200 40
+300 31
+500 182
