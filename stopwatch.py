@@ -57,13 +57,12 @@ def load_track(track):
     for n in range(leng):
         zones[n] = linecache.getline('trackdata.txt',13+n)
         zones[n] = zones[n][0:len(zones[n])-1]
+        zones[n] = str(zones[n])
+        zones[n] = zones[n].split(' ',2)
     return zones
 
 def analyze(zones,data,trackfile):
     print 'I analyze stuff.'
-
-
-
 
 
 
@@ -79,16 +78,20 @@ data = open(filename,'w')
 track = open(trackfile,'a')
 themap = open(mapfile,'r')
 
+#Before printing anything, clear terminal
+os.system('clear')
+
 #Map is printed from file and file is closed again.
 trackname = linecache.getline('trackdata.txt',2)
 print '\n \nThis is a map of ' + trackname
 print themap.read()
 themap.close()
 
+#Zones are printed
 zones = load_track(track)
 a = 1
 for obj in zones:
-    print 'Zone ' + str(a) + ': ' + obj
+    print 'Zone ' + str(a) + ' length: ' + obj[0] + ', expected time: ' + obj[1]
     a = a + 1
 print '\n'
 
@@ -97,17 +100,23 @@ tStart = start()
 
 #Race is going on as long as the user wants
 race = 'go'
+os.system('clear')
 while race != False:
     themap = open(mapfile,'r')
     print themap.read()
     themap.close()
+    #Analyze data on every run exept the first
     if race == True:
         analyze(zones,data,trackfile)
     race = lapTime(tStart)
-    os.system("clear")
+    #Clear terminal
+    os.system('clear')
 
+data.close()
 
+result = open(filename,'r')
+print result.read()
 
 #At end files are closed for safety
-data.close()
+result.close()
 track.close()
