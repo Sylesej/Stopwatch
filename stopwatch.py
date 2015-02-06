@@ -7,6 +7,7 @@ Toudal."""
 import time
 import sys
 import linecache
+import os
 
 def start():
   #This function defines the start time if the user chooses to.
@@ -19,7 +20,7 @@ def start():
       goOn = True
     elif inp == 'E':
       print 'You terminated the program.'
-      print 'Goodbye'
+      print 'Goodbye\n'
       sys.exit()
     else:
       print 'Your input was not accepted.'
@@ -40,8 +41,8 @@ def lapTime(startTime): #, data
   else:
     t = time.time()
     delta = t - startTime
-    data.write(str(delta) + '    ' + place + '\n')
-    print ' '*22 + 'Time: ' + str(delta) + ' '*4 + 'Position: ' + place + '\n'
+    data.write(str(delta) + ' ' + place + '\n')
+    #print ' '*22 + 'Time: '+ str(delta) + ' '*4 + 'Position: ' + place + '\n'
     return True
 
 def file_len(fname):
@@ -51,14 +52,16 @@ def file_len(fname):
     return i + 1
 
 def load_track(track):
-    leng = file_len(trackfile)
+    leng = file_len(trackfile) - 12
     zones = [0]*leng
     for n in range(leng):
         zones[n] = linecache.getline('trackdata.txt',13+n)
         zones[n] = zones[n][0:len(zones[n])-1]
     return zones
 
-#def analyze(zones,data,trackfile):
+def analyze(zones,data,trackfile):
+    print 'I analyze stuff.'
+
 
 
 
@@ -77,21 +80,32 @@ track = open(trackfile,'a')
 themap = open(mapfile,'r')
 
 #Map is printed from file and file is closed again.
-print 'This is a map of your track: '
+trackname = linecache.getline('trackdata.txt',2)
+print '\n \nThis is a map of ' + trackname
 print themap.read()
 themap.close()
 
 zones = load_track(track)
+a = 1
 for obj in zones:
-    print obj
+    print 'Zone ' + str(a) + ': ' + obj
+    a = a + 1
+print '\n'
 
 #Time is started by user command
 tStart = start()
 
 #Race is going on as long as the user wants
-race = True
+race = 'go'
 while race != False:
-  race = lapTime(tStart)
+    themap = open(mapfile,'r')
+    print themap.read()
+    themap.close()
+    if race == True:
+        analyze(zones,data,trackfile)
+    race = lapTime(tStart)
+    os.system("clear")
+
 
 
 #At end files are closed for safety
