@@ -29,16 +29,19 @@ def start():
 
 def lapTime(startTime): #, data
   #This function writes the time since startTime in datafile choosen by user
-  place = raw_input('Enter a position on the track: ')
+  leng = str(file_len(trackfile) - 12)
+  print  'There are ' + leng + ' positions on the track.'
+  text = 'Enter a position between 1 and ' + leng +', or enter E for exit: '
+  place = raw_input(text)
   if place == 'E':
     print 'You terminated the program.'
-    print 'Goodbye'
+    print 'Goodbye \n'
     return False
   else:
     t = time.time()
     delta = t - startTime
     data.write(str(delta) + '    ' + place + '\n')
-    print ' '*20 + 'Time: ' + str(delta) + ' '*4 + 'Position: '+ place
+    print ' '*22 + 'Time: ' + str(delta) + ' '*4 + 'Position: ' + place + '\n'
     return True
 
 def file_len(fname):
@@ -48,27 +51,30 @@ def file_len(fname):
     return i + 1
 
 def load_track(track):
-    len = file_len(trackfile)
-    zones = [0]*len
-    for n in range(len):
+    leng = file_len(trackfile)
+    zones = [0]*leng
+    for n in range(leng):
         zones[n] = linecache.getline('trackdata.txt',13+n)
+        zones[n] = zones[n][0:len(zones[n])-1]
     return zones
+
+#def analyze(zones,data,trackfile):
 
 
 
 
 
 #Ask user for output file name and trackname
-#For development 'trackdata.txt' can be used.
-filename = raw_input('Select a name for your output data file: ')
-trackfile = raw_input('Enter name of track data file: ')
+#For development 'trackdata.txt' and 'some.dat ' are selected
+filename = 'some.dat' #raw_input('Select a name for your output data file: ')
+trackfile = 'trackdata.txt' #raw_input('Enter name of track data file: ')
 mapfile = linecache.getline('trackdata.txt',4)
 mapfile = mapfile[0:len(mapfile)-1]
 
 #Files are opened
 data = open(filename,'w')
 track = open(trackfile,'a')
-themap = open(mapfile)
+themap = open(mapfile,'r')
 
 #Map is printed from file and file is closed again.
 print 'This is a map of your track: '
@@ -76,7 +82,6 @@ print themap.read()
 themap.close()
 
 zones = load_track(track)
-track.close()
 for obj in zones:
     print obj
 
@@ -91,3 +96,4 @@ while race != False:
 
 #At end files are closed for safety
 data.close()
+track.close()
