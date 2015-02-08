@@ -12,6 +12,8 @@ import sys
 import linecache
 import os
 
+################################################################################
+
 def start():
     goOn = False
     #This function defines the start time if the user chooses to.
@@ -53,10 +55,10 @@ def file_len(fname):
             pass
     return i + 1
 
-def analyze(data,zonedict):
+def analyze(data,zonedict,metadict):
     #Read file from beginning, file is read on every itteration of while loop.
     #Not super elegant.
-    data.seek(0,0)
+    data.seek(4,0)
     #Read data into content, to treat as a str
     content = data.read()
     #Split data into each line, will output a 2d array
@@ -69,13 +71,22 @@ def analyze(data,zonedict):
         #Split by space, into 2d again
         splits[n] = splits[n].split()
         #Time is first, then sector indicator.
-        times[n] = splits[n][0]
-        sector[n] = splits[n][1]
-        #Print for confirmation
-        print 'Line: ' +str(n+1) + ' Time: ' +times[n] + ' Sector: ' +sector[n]
-        print 'Sector length: ' + str(zonedict[n+1][0])
-        print 'Expected time: ' + str(zonedict[n+1][1]) + '\n'
+        times[n] = float(splits[n][0])
+        sector[n] = int(splits[n][1])
 
+        if times[n]-times[n-1]<zonedict[int(sector[n])][1]:
+            commentsec = ' seconds faster than expected.\n'
+            sectord = zonedict[sector[n]][1]-(times[n]-times[n-1])
+        else:
+            commentsec = ' seconds slower than expected.\n'
+            sectord = times[n]-times[n-1]-zonedict[sector[n]][1]
+        racetimea = 0
+        for t in times:
+            racetimea = racetimea + t
+        laptime = metadict['Timelimit']/metadict['Laps']
+        print 'Sector: ' + str(sector[n]) + ' Time: ' + str(times[n]-times[n-1])
+        print 'This sector you are: ' + str(sectord) + commentsec
+        #print 'In this race you are: ' + str(raced) + commentrac
 
 def trackdict(trackfile):
     track.seek(0,0)
@@ -86,7 +97,8 @@ def trackdict(trackfile):
     tmeta = tcontent[0]
     tmeta = tmeta.split()
     metadict = {'Trackname': tmeta[1], 'Mapfile': tmeta[3],
-    'Timelimit': tmeta[5], 'Tracklength': tmeta[7], 'Laps': tmeta[9]}
+    'Timelimit': float(tmeta[5]), 'Tracklength': float(tmeta[7]),
+    'Laps': int(tmeta[9])}
     tcontent = tcontent[1]
     tcontent = tcontent.split()
     zonedict = {}
@@ -109,6 +121,8 @@ mapfile = mapfile[0:len(mapfile)-1]
 data = open(filename,'w+')
 track = open(trackfile,'r')
 themap = open(mapfile,'r')
+
+data.write('0 0\n')
 
 #Before printing anything, clear terminal
 os.system('clear')
@@ -143,17 +157,17 @@ while race != False:
     themap.close()
     #Analyze data on every run exept the first
     if race == True:
-        analyze(data,zonedict)
+        analyze(data,zonedict,metadict)
     race = lapTime(tStart)
     #Clear terminal
     os.system('clear')
 
-data.close()
-
 print 'Results of this run:\n'
-result = open(filename,'r')
-print result.read()
+data.seek(4,0)
+print data.read()
+
+################################################################################
 
 #At end files are closed for safety
-result.close()
 track.close()
+data.close()
