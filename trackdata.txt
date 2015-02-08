@@ -1,5 +1,5 @@
 Trackname:
-Shell Eco Marathon
+ShellEcoMarathon
 Mapfile:
 mapfile.txt
 timeLimit:

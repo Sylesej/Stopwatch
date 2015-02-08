@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: UTF-8 -*-
+
 """This script is an advanced stopwatch
 designed for use by the DTU Roadrunners
 at the Shell Eco Marathon. v0.1 by Nils
@@ -50,16 +53,6 @@ def file_len(fname):
             pass
     return i + 1
 
-def load_track(track):
-    leng = file_len(trackfile) - 12
-    zones = [0]*leng
-    for n in range(leng):
-        zones[n] = linecache.getline('trackdata.txt',13+n)
-        zones[n] = zones[n][0:len(zones[n])-1]
-        zones[n] = str(zones[n])
-        zones[n] = zones[n].split(' ',2)
-    return zones
-
 def analyze(data,zonedict):
     #Read file from beginning, file is read on every itteration of while loop.
     #Not super elegant.
@@ -90,14 +83,19 @@ def trackdict(trackfile):
     tcontent = track.read()
     tcontent = str(tcontent)
     tcontent = tcontent.split('zones:\n')
+    tmeta = tcontent[0]
+    tmeta = tmeta.split()
+    metadict = {'Trackname': tmeta[1], 'Mapfile': tmeta[3],
+    'Timelimit': tmeta[5], 'Tracklength': tmeta[7], 'Laps': tmeta[9]}
     tcontent = tcontent[1]
     tcontent = tcontent.split()
     zonedict = {}
     for n in range(len(tcontent)/2):
         zonedict[n+1] = [int(tcontent[n*2]),int(tcontent[n*2+1])]
-    print zonedict
-    return zonedict
+    return [metadict,zonedict]
 
+
+################################################################################
 
 
 #Ask user for output file name and trackname
@@ -121,16 +119,16 @@ print '\n \nThis is a map of ' + trackname
 print themap.read()
 themap.close()
 
-#Zones are printed
-zones = load_track(track)
-a = 1
-for obj in zones:
-    print 'Zone ' + str(a) + ' length: ' + obj[0] + ', expected time: ' + obj[1]
-    a = a + 1
-print '\n'
-
 #Zones area loaded from trackfile
-zonedict = trackdict(trackfile)
+zonedict = trackdict(trackfile)[1]
+metadict = trackdict(trackfile)[0]
+
+#Zones are printed
+for item in zonedict:
+    p1 = 'Zone: ' + str(item)
+    p2 = ' Zonelength: ' + str(zonedict[item][0])
+    p3 = ' Expected time: ' + str(zonedict[item][1]) + '\n'
+    print p1 + p2 + p3
 
 #Time is started by user command
 tStart = start()
@@ -152,6 +150,7 @@ while race != False:
 
 data.close()
 
+print 'Results of this run:\n'
 result = open(filename,'r')
 print result.read()
 
