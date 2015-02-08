@@ -84,7 +84,7 @@ def analyze(data,zonedict):
         print 'Expected time: ' + str(zonedict[n+1][1]) + '\n'
 
 
-def loadtrack(trackfile):
+def trackdict(trackfile):
     track.seek(0,0)
     #Read data into content, to treat as a str
     tcontent = track.read()
@@ -130,7 +130,7 @@ for obj in zones:
 print '\n'
 
 #Zones area loaded from trackfile
-zonedict = loadtrack(trackfile)
+zonedict = trackdict(trackfile)
 
 #Time is started by user command
 tStart = start()
