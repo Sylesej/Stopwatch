@@ -44,11 +44,15 @@ def lapTime(startTime): #, data
     return False
   elif place == 't':
     return 't'
+  elif place == '5':
+    t = time.time()
+    delta = t - startTime
+    data.write(str(delta) + ' ' + place + '\n')
+    return 'newLap'
   else:
     t = time.time()
     delta = t - startTime
     data.write(str(delta) + ' ' + place + '\n')
-    #print ' '*22 + 'Time: '+ str(delta) + ' '*4 + 'Position: ' + place + '\n'
     return True
 
 def file_len(fname):
@@ -89,7 +93,7 @@ def comment(times,zonedict,sectors,type):
         text = ' seconds slower than expected in this '
         return str(actual-expected) + text + typel
 
-def analyze(data,zonedict,metadict):
+def dataRead(data):
     #Read file from beginning, file is read on every itteration of while loop.
     #Not super elegant.
     data.seek(4,0)
@@ -107,12 +111,34 @@ def analyze(data,zonedict,metadict):
         #Time is first, then sector indicator.
         times[n] = float(splits[n][0])
         sector[n] = int(splits[n][1])
+    return times,sector
+
+def analyze(data,zonedict,metadict):
+#    #Read file from beginning, file is read on every itteration of while loop.
+#    #Not super elegant.
+#    data.seek(4,0)
+#    #Read data into content, to treat as a str
+#    content = data.read()
+#    #Split data into each line, will output a 2d array
+#    splits = content.splitlines()
+#    times = [0]*len(splits)
+#    sector = [0]*len(splits)
+#    for n in range(len(splits)):
+#        #Convert to string to use string methods. Back to 1d array.
+#        splits[n] = str(splits[n])
+#        #Split by space, into 2d again
+#        splits[n] = splits[n].split()
+#        #Time is first, then sector indicator.
+#        times[n] = float(splits[n][0])
+#        sector[n] = int(splits[n][1])
+    times,sector = dataRead(data)
 
     seccom = comment(times,zonedict,sector,'s')
     lapcom = comment(times,zonedict,sector,'l')
     raccom = comment(times,zonedict,sector,'r')
 
-    print 'Sector: ' + str(sector[n]) + ' Time: ' + str(times[n]-times[n-1])
+    c = len(times)-1
+    print 'Sector: ' + str(sector[c]) + ' Time: ' + str(times[c]-times[c-1])
     print 'This sector you are: '+ seccom
     print 'On this lap you are: ' + lapcom
     print 'In this race you are: '+ raccom
@@ -179,6 +205,7 @@ for item in zonedict:
 tStart = start()
 
 #Race is going on as long as the user wants
+lapsRemaining = metadict['Laps']
 race = 'go'
 entries = 1
 os.system('clear')
@@ -190,6 +217,21 @@ while race != False:
     #Analyze data on every run exept the first
     if race == True:
         analyze(data,zonedict,metadict)
+    elif race == 'newLap':
+        times,sectors = dataRead(data)
+        analyze(data,zonedict,metadict)
+        #Find remaining laps
+        lapsRemaining = lapsRemaining - 1
+        #Time for rest of the laps
+        rest = (metadict['Timelimit']-time.time()+tStart)/lapsRemaining
+        #Time spend on the last lap
+        actual = 0
+        for n in range(sectors[-1]):
+            actual = actual + times[-n-1]
+        if rest<actual:
+            print 'You need to drive ' + str(actual-rest) + ' seconds FASTER.'
+        else:
+            print 'You need to drive ' + str(rest-actual) + ' seconds SLOWER.'
     elif race == 't':
         print 'Time now: ' + str(time.time()-tStart)
         print 'Time remaining '+str(metadict['Timelimit']-time.time()+tStart)

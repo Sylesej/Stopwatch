@@ -15,6 +15,7 @@ Feature requests:
 
 Other to-dos:
  * Decide on track-data, map and output syntax
+ * Implement GUI?
 
 Bugs:
  * Analyze on first sector shows time 0
