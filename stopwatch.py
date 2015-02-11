@@ -42,6 +42,8 @@ def lapTime(startTime): #, data
     print 'You terminated the program.'
     print 'Goodbye \n'
     return False
+  elif place == 't':
+    return 't'
   else:
     t = time.time()
     delta = t - startTime
@@ -114,6 +116,8 @@ def analyze(data,zonedict,metadict):
     print 'This sector you are: '+ seccom
     print 'On this lap you are: ' + lapcom
     print 'In this race you are: '+ raccom
+    #print 'Time remaining: ' + str(metadict['Timelimit']-times[-1])
+
 
 def trackdict(trackfile):
     track.seek(0,0)
@@ -180,11 +184,15 @@ entries = 1
 os.system('clear')
 while race != False:
     themap = open(mapfile,'r')
+    #themap.seek(0.0)
     print themap.read()
     themap.close()
     #Analyze data on every run exept the first
     if race == True:
         analyze(data,zonedict,metadict)
+    elif race == 't':
+        print 'Time now: ' + str(time.time()-tStart)
+        print 'Time remaining '+str(metadict['Timelimit']-time.time()+tStart)
     race = lapTime(tStart)
     #Clear terminal
     os.system('clear')
