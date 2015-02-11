@@ -55,6 +55,38 @@ def file_len(fname):
             pass
     return i + 1
 
+def comment(times,zonedict,sectors,type):
+    #expected- and actual time as function of type
+    lap = sectors.count(1)
+    if type=='s':
+        expected = zonedict[sectors[-1]][1]
+        actual = times[-1]
+        typel = 'sector'
+    elif type=='l':
+        expected = 0
+        for n in range(sectors[-1]):
+            expected = expected + zonedict[n+1][1]
+        actual = 0
+        for n in range(sectors[-1]):
+            actual = actual + times[-n-1]
+        typel='lap'
+    elif type=='r':
+        expected = 0
+        for item in zonedict.values():
+            expected = expected + item [1]
+        expected = expected * (sectors.count(1)-1)
+        for n in range(sectors[-1]):
+            expected = expected + zonedict[n+1][1]
+        actual = sum(times)
+        typel='race'
+
+    if actual<expected:
+        text = ' seconds faster than expected in this '
+        return str(expected-actual) + text + typel
+    else:
+        text = ' seconds slower than expected in this '
+        return str(actual-expected) + text + typel
+
 def analyze(data,zonedict,metadict):
     #Read file from beginning, file is read on every itteration of while loop.
     #Not super elegant.
@@ -74,19 +106,14 @@ def analyze(data,zonedict,metadict):
         times[n] = float(splits[n][0])
         sector[n] = int(splits[n][1])
 
-        if times[n]-times[n-1]<zonedict[int(sector[n])][1]:
-            commentsec = ' seconds faster than expected.\n'
-            sectord = zonedict[sector[n]][1]-(times[n]-times[n-1])
-        else:
-            commentsec = ' seconds slower than expected.\n'
-            sectord = times[n]-times[n-1]-zonedict[sector[n]][1]
-        racetimea = 0
-        for t in times:
-            racetimea = racetimea + t
-        laptime = metadict['Timelimit']/metadict['Laps']
-        print 'Sector: ' + str(sector[n]) + ' Time: ' + str(times[n]-times[n-1])
-        print 'This sector you are: ' + str(sectord) + commentsec
-        #print 'In this race you are: ' + str(raced) + commentrac
+    seccom = comment(times,zonedict,sector,'s')
+    lapcom = comment(times,zonedict,sector,'l')
+    raccom = comment(times,zonedict,sector,'r')
+
+    print 'Sector: ' + str(sector[n]) + ' Time: ' + str(times[n]-times[n-1])
+    print 'This sector you are: '+ seccom
+    print 'On this lap you are: ' + lapcom
+    print 'In this race you are: '+ raccom
 
 def trackdict(trackfile):
     track.seek(0,0)
