@@ -217,6 +217,9 @@ while race != False:
     #Analyze data on every run exept the first
     if race == True:
         analyze(data,zonedict,metadict)
+    """If you enter a new lap,
+    you will get feedback about how much faster/slower
+     you need to drive on the next."""
     elif race == 'newLap':
         times,sectors = dataRead(data)
         analyze(data,zonedict,metadict)
